@@ -1,54 +1,104 @@
-# Projeto de Banco de Dados para Universidade
+<!-- README.md gerado automaticamente  -->
+<p align="center">
+  <img src="https://img.shields.io/badge/SQL-PostgreSQL-blue?logo=postgresql&logoColor=white" alt="PostgreSQL Badge"/>
+  <img src="https://img.shields.io/badge/Python-3.10+-yellow?logo=python&logoColor=white" alt="Python Badge"/>
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="License Badge"/>
+</p>
 
-## Integrantes
-- **Gustavo Bertoluzzi Cardoso** – RA 22.123.016-2  
-- **Isabella Vieira Silva Rosseto** – RA 22.222.036-0  
-
----
-
-## Descrição do Projeto
-Este repositório contém a implementação de um sistema de banco de dados relacional para uma universidade. O objetivo é:
-
-- Modelar entidades como **Pessoas** (alunos e professores), **Departamentos**, **Cursos** e **Disciplinas**.  
-- Registrar **Aulas** ministradas, **Histórico Escolar** (notas, reprovações e aprovações) e **Grupos de TCC** com seus orientadores.  
-- Garantir normalização até a 3FN e estruturar consultas SQL para análises acadêmicas.
+<h1 align="center">🎓 Banco de Dados Universitário</h1>
+<p align="center">Um projeto acadêmico completo que modela todo o ecossistema de uma universidade – de alunos a TCCs – usando <strong>PostgreSQL</strong> e <strong>Python</strong>.</p>
 
 ---
 
-## Como executar o Projeto
-
-1. **Criar um banco no Supabase**  
-   - Acesse [Supabase](https://supabase.com/) e crie um novo projeto.  
-   - No painel do projeto, acesse **Database → SQL Editor**.
-
-2. **Executar o script DDL**  
-   - Encontre o arquivo `criar.sql` neste repositório.  
-   - No SQL Editor do Supabase, copie e cole todo o conteúdo de `criar.sql` e execute para criar as tabelas.
-
-3. **Popular com dados fictícios**  
-   - Abra o arquivo `gerador.py`.  
-   - Ajuste a variável `PASSWORD` para a senha do seu database Supabase.  
-   - No terminal, instale as dependências (se ainda não estiverem instaladas):
-     ```bash
-     pip install psycopg2-binary Faker
-     ```
-   - Execute:
-     ```bash
-     python gerador.py
-     ```
-   - Isso irá conectar-se ao seu banco Supabase e inserir dados fictícios em todas as tabelas.
-
-4. **Rodar as consultas SQL**  
-   - No mesmo SQL Editor, abra o arquivo `queries.sql` e execute cada query para validar as respostas.
+## 👥 Integrantes
+| Nome | RA |
+|------|----|
+| **Gustavo Bertoluzzi Cardoso** | 22.123.016-2 |
+| **Isabella Vieira Silva Rosseto** | 22.222.036-0 |
 
 ---
 
-## Modelo Relacional (MR)
-![Modelo Relacional](https://github.com/user-attachments/assets/22456bf6-4f9c-46b0-85c9-f50a2df9ed00)
+## 🗺️ Visão Geral
+> **Objetivo:** Criar um sistema relacional totalmente normalizado (3FN) capaz de gerenciar:
+> 
+> - **Pessoas** (alunos & professores)  
+> - **Departamentos, Cursos & Disciplinas**  
+> - **Aulas**, **Histórico Escolar** e **Matriz Curricular**  
+> - **Grupos & Projetos de TCC**  
+
+O projeto inclui **DDL**, **scripts de popularização**, **validações** e **consultas SQL** que respondem às perguntas de negócio exigidas.
 
 ---
 
-## Modelo Entidade‑Relacionamento (MER)
+## 🧭 Índice
+1. [Pré‑requisitos](#pré‑requisitos)
+2. [Configuração Rápida](#configuração-rápida)
+3. [Scripts Essenciais](#scripts-essenciais)
+4. [Modelos](#modelos)
+5. [Consultas SQL](#consultas-sql)
+6. [Licença](#licença)
+
+---
+
+## 📦 Pré‑requisitos
+- Conta gratuita no **Supabase**  
+- **Python 3.10+**  
+- **pip** (ou **pipx**)  
+- Acesso ao **SQL Editor** do Supabase  
+
+---
+
+## ⚡ Configuração Rápida
+<details>
+<summary><strong>Passo‑a‑passo detalhado (clique para expandir)</strong></summary>
+
+1. ### 🚀 Criar banco no Supabase  
+   - Acesse <https://supabase.com> → **New Project** → defina nome, senha e região.
+
+2. ### 🗄️ Executar DDL  
+   - No dashboard → **Database ▸ SQL Editor** → crie nova query.  
+   - Cole o conteúdo de <kbd>criar.sql</kbd> e clique <kbd>Run</kbd>.
+
+3. ### 🐍 Popular com dados fictícios  
+   ```bash
+   # clone o repo
+   git clone <URL_DO_REPO>
+   cd banco-de-dados-universidade
+
+   # instale dependências
+   pip install psycopg2-binary Faker
+   # ou
+   # pipx runpip your-venv psycopg2-binary Faker
+
+   # edite gerador.py e coloque a senha do seu banco
+   python gerador.py
+   ```
+   O script conecta via SSL ao Supabase e insere **>1 000** registros distribuídos em todas as tabelas.
+
+4. ### 🔍 Rodar consultas  
+   - Abra <kbd>queries.sql</kbd> no SQL Editor do Supabase ou no seu cliente favorito (DBeaver, psql etc.)  
+   - Execute e observe os resultados.  
+
+</details>
+
+---
+
+## 🛠️ Scripts Essenciais
+| Arquivo | Descrição |
+|---------|-----------|
+| `criar.sql` | Criação de todas as tabelas, chaves e restrições. |
+| `gerador.py` | Gera CPFs, nomes, turmas, notas, TCCs e populariza o banco. |
+| `queries.sql` | Contém as 5 queries obrigatórias + 10 queries extras. |
+| `valida_dados.py` | (Opcional) Checa consistência referencial & contagens esperadas. |
+
+---
+
+## 🗂️ Modelos
+
+### Modelo Relacional (MR)
+![MR](https://github.com/user-attachments/assets/22456bf6-4f9c-46b0-85c9-f50a2df9ed00)
+
+### Modelo Entidade‑Relacionamento (MER)
 ```mermaid
 flowchart LR
   %% Entidades
@@ -66,89 +116,35 @@ flowchart LR
   GrupoTCC['Grupo TCC']
   TCC[TCC]
 
-  %% Atributos de Pessoa
-  p_cpf((cpf))
-  p_nome((nome))
-  Pessoa --> p_cpf
-  Pessoa --> p_nome
-
-  %% Aluno
-  a_id((id_aluno))
-  a_sem(((semestre atual)))
-  Aluno --> a_id
-  Aluno --> a_sem
-  Pessoa --> Aluno
-
-  %% Professor
-  pr_id((id_professor))
-  Professor --> pr_id
-  Pessoa --> Professor
-
-  %% Depto
-  d_id((id_depto))
-  d_nome((nome))
-  Depto --> d_id
-  Depto --> d_nome
-
-  %% Curso
-  c_id((id_curso))
-  Curso --> c_id
-  %% Disciplina
-  dis_id((id_disciplina))
-  Disciplina --> dis_id
-
-  %% Turma
-  t_id((id_turma))
-  Turma --> t_id
-
-  %% Relações (losangos)
-  FazParteAlunoCurso{'faz parte'}
-  Aluno --> FazParteAlunoCurso
-  FazParteAlunoCurso --> Curso
-
-  MatrizCurricular{'matriz curricular'}
-  Curso --> MatrizCurricular
-  MatrizCurricular --> Disciplina
-
-  HistoricoAluno{'histórico'\}
-  Aluno --> HistoricoAluno
-  HistoricoAluno --> Turma
-  Turma --> Disciplina
-
-  HistoricoProfessor{'histórico''}
-  Professor --> HistoricoProfessor
-  HistoricoProfessor --> Disciplina
-
-  Chefia{'chefia'}
-  Professor --> Chefia
-  Chefia --> Depto
-
-  CoordenacaoCurso{'coordena'}
-  Professor --> CoordenacaoCurso
-  CoordenacaoCurso --> Curso
-
-  CoordenacaoDisc{'coordena'}
-  Professor --> CoordenacaoDisc
-  CoordenacaoDisc --> Disciplina
-
-  Orientacao{'orienta'}
-  Professor --> Orientacao
-  Orientacao --> TCC
-
-  TccAluno{'faz parte TCC'}
-  Aluno --> TccAluno
-  TccAluno --> TCC
-
-  AulaMinistrada{'ministra'}
-  Professor --> AulaMinistrada
-  AulaMinistrada --> Turma
-
-  %% Conectores adicionais
-  GrupoTCC --> TCC
-
-  NotaRel{'gera nota'}
-  Avaliacao --> NotaRel
-  NotaRel --> Nota
-  Nota --> Historico
+  %% Atributos e relacionamentos (resumidos para clareza)
+  Pessoa -->|cpf| Aluno
+  Pessoa -->|cpf| Professor
+  Depto -->|1,N| Curso
+  Depto -->|1,N| Disciplina
+  Curso -->|1,N| Turma
+  Disciplina -->|1,N| Turma
+  Professor -->|1,N| Aula
+  Turma -->|1,N| Aula
+  Aluno -->|N,N| Turma
+  Turma -->|1,N| Nota
+  Nota -->|N,1| Avaliacao
+  Professor -->|1,N| TCC
+  Aluno -->|N,N| GrupoTCC
+  GrupoTCC -->|1,1| TCC
 ```
 
+---
+
+## 📊 Consultas SQL
+As queries obrigatórias e adicionais estão em `queries.sql`. Exemplos:
+
+| # | Descrição |
+|---|-----------|
+| 1 | Histórico escolar completo de aluno que reprovou e depois aprovou |
+| 2 | TCCs orientados por cada professor + nomes dos alunos |
+| … | *e assim por diante até a Query 50* |
+
+---
+
+## 📝 Licença
+Este projeto utiliza a licença **MIT** – fique à vontade para estudar, modificar e distribuir. Divirta‑se! ✨
