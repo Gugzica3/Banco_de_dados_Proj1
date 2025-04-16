@@ -1,1 +1,107 @@
+-- Query 09: Número total de estudantes que cursaram “Inteligência Artificial”
+SELECT
+    COUNT(DISTINCT hs.id_aluno) AS total_alunos
+FROM HistoricoEscolar hs
+JOIN Turma t   ON t.id_turma   = hs.id_turma
+JOIN Curso c   ON c.id_curso   = t.id_curso
+WHERE c.nome ILIKE '%Inteligencia Artificial%';
 
+-- 01. Encontre os nomes de todos os estudantes
+SELECT
+    p.nome AS nome_aluno
+FROM Aluno a
+JOIN Pessoa p ON p.cpf = a.cpf
+ORDER BY p.nome;
+
+-- 02. Liste os IDs e nomes de todos os professores
+SELECT
+    pr.id_professor,
+    pes.nome AS nome_professor
+FROM Professor pr
+JOIN Pessoa pes ON pes.cpf = pr.cpf
+ORDER BY pr.id_professor;
+
+-- 10. Recupere os IDs e nomes dos estudantes orientados por um professor específico
+SELECT DISTINCT
+    a.id_aluno,
+    p.nome       AS nome_aluno
+FROM TCC t
+JOIN Grupo_TCC g
+  ON g.id_grupo = t.id_grupo
+CROSS JOIN LATERAL (
+    VALUES
+      (g.aluno1),
+      (g.aluno2),
+      (g.aluno3),
+      (g.aluno4),
+      (g.aluno5)
+) AS membros(id_aluno)
+JOIN Aluno   a ON a.id_aluno = membros.id_aluno
+JOIN Pessoa  p ON p.cpf      = a.cpf
+WHERE t.orientador = 2
+ORDER BY a.id_aluno;
+-- 11. Encontre os estudantes que cursaram tanto "Estruturas de Dados" quanto "Filosofia"
+SELECT
+    a.id_aluno,
+    p.nome       AS nome_aluno
+FROM HistoricoEscolar hs
+JOIN Nota        n  ON n.id_nota       = hs.id_nota
+JOIN Turma       t  ON t.id_turma      = hs.id_turma
+JOIN Disciplina  d  ON d.id_disciplina = t.id_disciplina
+JOIN Aluno       a  ON a.id_aluno      = hs.id_aluno
+JOIN Pessoa      p  ON p.cpf           = a.cpf
+WHERE d.nome IN ('Estruturas de Dados','Filosofia')
+GROUP BY a.id_aluno, p.nome
+HAVING COUNT(DISTINCT d.nome) = 1
+ORDER BY p.nome;
+-- 35. Recupere os nomes dos estudantes que cursaram disciplinas em mais de 3 departamentos
+
+SELECT
+    p.nome AS nome_aluno
+FROM HistoricoEscolar hs
+JOIN Nota        n    ON n.id_nota       = hs.id_nota
+JOIN Turma       t    ON t.id_turma      = hs.id_turma
+JOIN Disciplina  d    ON d.id_disciplina = t.id_disciplina
+JOIN Depto       dept ON dept.id_depto   = d.id_depto
+JOIN Aluno       a    ON a.id_aluno      = hs.id_aluno
+JOIN Pessoa      p    ON p.cpf           = a.cpf
+GROUP BY
+    a.id_aluno,
+    p.nome
+HAVING
+    COUNT(DISTINCT dept.id_depto) > 3
+ORDER BY
+    p.nome;
+-- 38. IDs dos estudantes que NÃO estão em nenhum curso do departamento “Ciência da Computação”
+SELECT
+    a.id_aluno
+FROM Aluno a
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM Curso c
+    JOIN Depto d ON d.id_depto = c.id_depto
+    WHERE c.id_curso = a.id_curso
+      AND d.nome = 'Matematica'
+)
+ORDER BY a.id_aluno;
+-- 39. Encontre os nomes dos professores que ministraram turmas nas quais
+--     todos os alunos receberam nota = 7
+
+SELECT
+    pr.id_professor,
+    pes.nome      AS nome_professor
+FROM Professor pr
+JOIN Pessoa     pes  ON pes.cpf            = pr.cpf
+JOIN Aula       a    ON a.professor_aula   = pr.id_professor
+JOIN Turma      t    ON t.id_turma         = a.id_turma
+JOIN HistoricoEscolar hs ON hs.id_turma    = t.id_turma
+JOIN Nota       n    ON n.id_nota          = hs.id_nota
+JOIN Avaliacao  av   ON av.id_avaliacao    = n.id_avaliacao
+GROUP BY
+    pr.id_professor,
+    pes.nome
+HAVING
+    MIN(av.nota) = 7
+    AND MAX(av.nota) = 7
+ORDER BY
+    pr.id_professor;
