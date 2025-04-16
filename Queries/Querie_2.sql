@@ -1,24 +1,16 @@
-SELECT 
-    tcc.titulo,
-    p_orientador.nome AS orientador,
-    CONCAT_WS(', ',
-              pa1.nome,
-              pa2.nome,
-              pa3.nome,
-              pa4.nome,
-              pa5.nome) AS alunos
-FROM TCC tcc
-JOIN Professor pr ON tcc.orientador = pr.id_professor
-JOIN Pessoa p_orientador ON pr.cpf = p_orientador.cpf
-JOIN Grupo_TCC gt ON tcc.id_grupo = gt.id_grupo
-LEFT JOIN Aluno a1 ON gt.aluno1 = a1.id_aluno
-LEFT JOIN Pessoa pa1 ON a1.cpf = pa1.cpf
-LEFT JOIN Aluno a2 ON gt.aluno2 = a2.id_aluno
-LEFT JOIN Pessoa pa2 ON a2.cpf = pa2.cpf
-LEFT JOIN Aluno a3 ON gt.aluno3 = a3.id_aluno
-LEFT JOIN Pessoa pa3 ON a3.cpf = pa3.cpf
-LEFT JOIN Aluno a4 ON gt.aluno4 = a4.id_aluno
-LEFT JOIN Pessoa pa4 ON a4.cpf = pa4.cpf
-LEFT JOIN Aluno a5 ON gt.aluno5 = a5.id_aluno
-LEFT JOIN Pessoa pa5 ON a5.cpf = pa5.cpf
-ORDER BY tcc.titulo;
+SELECT
+    t.id_grupo,
+    t.titulo,
+    p_orient.nome                        AS professor_orientador,
+    p_aluno.nome                         AS aluno_integrante
+FROM TCC                t
+JOIN Professor      prof ON prof.id_professor = t.orientador
+JOIN Pessoa      p_orient ON p_orient.cpf     = prof.cpf
+JOIN Grupo_TCC           g ON g.id_grupo     = t.id_grupo
+LEFT JOIN LATERAL (
+        VALUES (g.aluno1), (g.aluno2), (g.aluno3), (g.aluno4), (g.aluno5)
+    ) AS g_unpivot(id_aluno)            ON TRUE
+JOIN Aluno               a ON a.id_aluno     = g_unpivot.id_aluno
+JOIN Pessoa          p_aluno ON p_aluno.cpf  = a.cpf
+WHERE t.orientador = 6
+ORDER BY t.id_grupo, p_aluno.nome;
