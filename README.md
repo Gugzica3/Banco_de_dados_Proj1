@@ -17,37 +17,29 @@ Este repositório contém a implementação de um sistema de banco de dados rela
 
 ## Como executar o Projeto
 
-1. **Clone o repositório**  
-   ```bash
-   git clone <URL_DO_REPOSITORIO>
-   cd banco-de-dados-universidade
-   ```
+1. **Criar um banco no Supabase**  
+   - Acesse [Supabase](https://supabase.com/) e crie um novo projeto.  
+   - No painel do projeto, acesse **Database → SQL Editor**.
 
-2. **Crie o banco e execute o DDL**  
-   - Instale o PostgreSQL (≥ 12) e crie um database chamado `postgres` (ou ajuste no script).  
-   - Rode:
-     ```bash
-     psql -U <seu_usuario> -d postgres -f ddl.sql
-     ```
+2. **Executar o script DDL**  
+   - Encontre o arquivo `criar.sql` neste repositório.  
+   - No SQL Editor do Supabase, copie e cole todo o conteúdo de `criar.sql` e execute para criar as tabelas.
 
-3. **Popule com dados fictícios**  
-   - Instale dependências Python:
+3. **Popular com dados fictícios**  
+   - Abra o arquivo `gerador.py`.  
+   - Ajuste a variável `PASSWORD` para a senha do seu database Supabase.  
+   - No terminal, instale as dependências (se ainda não estiverem instaladas):
      ```bash
      pip install psycopg2-binary Faker
      ```
-   - Execute o gerador de dados:
+   - Execute:
      ```bash
-     python popula_tudo.py
+     python gerador.py
      ```
+   - Isso irá conectar-se ao seu banco Supabase e inserir dados fictícios em todas as tabelas.
 
-4. **Valide a consistência**  
-   - Caso exista, rode:
-     ```bash
-     python valida_dados.py
-     ```
-
-5. **Execute as queries**  
-   - Abra e rode `queries.sql` no seu cliente favorito (psql, DBeaver, PgAdmin).
+4. **Rodar as consultas SQL**  
+   - No mesmo SQL Editor, abra o arquivo `queries.sql` e execute cada query para validar as respostas.
 
 ---
 
