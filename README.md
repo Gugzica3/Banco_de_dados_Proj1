@@ -60,20 +60,7 @@ O projeto inclui **DDL**, **scripts de popularização**, **validações** e **c
    - Cole o conteúdo de <kbd>criar.sql</kbd> e clique <kbd>Run</kbd>.
 
 3. ### 🐍 Popular com dados fictícios  
-   ```bash
-   # clone o repo
-   git clone <URL_DO_REPO>
-   cd banco-de-dados-universidade
-
-   # instale dependências
-   pip install psycopg2-binary Faker
-   # ou
-   # pipx runpip your-venv psycopg2-binary Faker
-
-   # edite gerador.py e coloque a senha do seu banco
-   python gerador.py
-   ```
-   O script conecta via SSL ao Supabase e insere **>1 000** registros distribuídos em todas as tabelas.
+   - Abra <kbd>gerador.py</kbd> conecte com o seu banco de dados mudando a senha e outros dados.
 
 4. ### 🔍 Rodar consultas  
    - Abra <kbd>queries.sql</kbd> no SQL Editor do Supabase ou no seu cliente favorito (DBeaver, psql etc.)  
@@ -89,7 +76,7 @@ O projeto inclui **DDL**, **scripts de popularização**, **validações** e **c
 | `criar.sql` | Criação de todas as tabelas, chaves e restrições. |
 | `gerador.py` | Gera CPFs, nomes, turmas, notas, TCCs e populariza o banco. |
 | `queries.sql` | Contém as 5 queries obrigatórias + 10 queries extras. |
-| `valida_dados.py` | (Opcional) Checa consistência referencial & contagens esperadas. |
+| `valida_dados.sql` | Checa consistência referencial & contagens esperadas. |
 
 ---
 
