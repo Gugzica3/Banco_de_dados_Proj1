@@ -105,3 +105,43 @@ HAVING
     AND MAX(av.nota) = 7
 ORDER BY
     pr.id_professor;
+-- 46. Estudantes que cursaram "Calculo" e "Filosofia" no mesmo semestre
+
+SELECT DISTINCT
+    a.id_aluno,
+    p.nome AS nome_aluno
+FROM HistoricoEscolar hs1
+JOIN Nota        n1 ON n1.id_nota       = hs1.id_nota
+JOIN Turma       t1 ON t1.id_turma      = hs1.id_turma
+JOIN Disciplina  d1 ON d1.id_disciplina = t1.id_disciplina
+
+JOIN HistoricoEscolar hs2
+  ON hs2.id_aluno = hs1.id_aluno
+JOIN Nota        n2 ON n2.id_nota       = hs2.id_nota
+JOIN Turma       t2 ON t2.id_turma      = hs2.id_turma
+JOIN Disciplina  d2 ON d2.id_disciplina = t2.id_disciplina
+
+JOIN Aluno       a  ON a.id_aluno       = hs1.id_aluno
+JOIN Pessoa      p  ON p.cpf            = a.cpf
+
+WHERE d1.nome = 'Calculo'
+  AND d2.nome = 'Filosofia'
+  AND t1.ano = t2.ano
+  AND t1.semestre_ano = t2.semestre_ano
+
+ORDER BY p.nome;
+-- 50. Liste os nomes dos estudantes que não cursaram nenhum curso
+--     no departamento de "Computador"
+
+SELECT
+    p.nome AS nome_aluno
+FROM Aluno a
+JOIN Pessoa p ON p.cpf = a.cpf
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM Curso c
+    JOIN Depto d ON d.id_depto = c.id_depto
+    WHERE c.id_curso   = a.id_curso
+      AND d.nome = 'Computador'
+)
+ORDER BY p.nome;
