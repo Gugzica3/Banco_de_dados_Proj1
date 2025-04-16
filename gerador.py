@@ -8,128 +8,113 @@ random.seed(42)
 # CONFIGURAÇÕES
 TOTAL_PROFESSORES = 20
 TOTAL_ALUNOS = 60
-TOTAL_DEPARTAMENTOS = 5
+TOTAL_PESSOAS = TOTAL_PROFESSORES + TOTAL_ALUNOS
+TOTAL_DEPTOS = 4
 TOTAL_CURSOS = 4
-TOTAL_DISCIPLINAS = 20
-TOTAL_TURMAS = 10
-TOTAL_AVALIACOES = 30
-GRUPO_TAMANHO = 5
-TOTAL_GRUPOS = ceil(TOTAL_ALUNOS / GRUPO_TAMANHO)
+# Usaremos 4 disciplinas fixas, conforme solicitado
+TOTAL_DISCIPLINAS = 4  
+TOTAL_TURMAS = 12
+TOTAL_AVALIACOES = 8  # Número reduzido para manter a saída razoável
+ALUNOS_POR_GRUPO = 5
+TOTAL_GRUPOS_TCC = TOTAL_ALUNOS // ALUNOS_POR_GRUPO
 
-# DADOS
-output = []
+# Nomes fixos conforme especificado:
+DEPTOS_FIXOS = ["Matemática", "Computador", "Engenharia", "Fisica"]
+CURSOS_FIXOS = ["Ciencias da Computação", "Ciencias de dados", "Inteligencia Artificial", "Engenharia de Reprodução"]
+DISCIPLINAS_FIXAS = ["Calculo", "deus é acreditar", "Banco de dados", "Python"]
 
-# CPFs únicos
-cpfs = [fake.unique.cpf() for _ in range(TOTAL_PROFESSORES + TOTAL_ALUNOS)]
-prof_cpfs = cpfs[:TOTAL_PROFESSORES]
-alu_cpfs = cpfs[TOTAL_PROFESSORES:]
+# Gerar CPFs únicos para todas as pessoas
+pessoas_cpfs = [fake.unique.cpf() for _ in range(TOTAL_PESSOAS)]
+professores_cpfs = pessoas_cpfs[:TOTAL_PROFESSORES]
+alunos_cpfs = pessoas_cpfs[TOTAL_PROFESSORES:]
 
-# PESSOAS
-output.append("-- PESSOAS")
-for cpf in cpfs:
-    nome = fake.name()
-    output.append(f"INSERT INTO Pessoa (cpf, nome) VALUES ('{cpf}', '{nome}');")
+# Gera o SQL de inserção para cada tabela
 
-# DEPARTAMENTOS
-output.append("\n-- DEPARTAMENTOS")
-for i in range(1, TOTAL_DEPARTAMENTOS + 1):
-    nome = f"Departamento {fake.word().capitalize()}"
-    output.append(f"INSERT INTO Depto (id_depto, nome, chefe_depto) VALUES ({i}, '{nome}', NULL);")
+### 1. Tabela Pessoa
+print("-- PESSOA")
+for cpf in pessoas_cpfs:
+    print(f"INSERT INTO Pessoa (cpf, nome) VALUES ('{cpf}', '{fake.name()}');")
 
-# PROFESSORES
-output.append("\n-- PROFESSORES")
-for i, cpf in enumerate(prof_cpfs, start=1):
-    id_depto = ((i - 1) % TOTAL_DEPARTAMENTOS) + 1
-    output.append(f"INSERT INTO Professor (id_professor, cpf, id_depto) VALUES ({i}, '{cpf}', {id_depto});")
+### 2. Tabela Depto (usando nomes fixos)
+print("\n-- DEPTO")
+for i in range(1, TOTAL_DEPTOS + 1):
+    nome_depto = DEPTOS_FIXOS[i - 1]
+    # A coluna chefe_depto ficará NULL para início; será atualizado depois.
+    print(f"INSERT INTO Depto (id_depto, nome, chefe_depto) VALUES ({i}, '{nome_depto}', NULL);")
 
-# DEFINIR CHEFES DE DEPARTAMENTO
-output.append("\n-- CHEFES DE DEPARTAMENTO")
-for i in range(1, TOTAL_DEPARTAMENTOS + 1):
-    output.append(f"UPDATE Depto SET chefe_depto = {i} WHERE id_depto = {i};")
+### 3. Tabela Professor
+print("\n-- PROFESSOR")
+for i, cpf in enumerate(professores_cpfs, start=1):
+    # Distribuir os professores de forma cíclica nos departamentos
+    id_depto = ((i - 1) % TOTAL_DEPTOS) + 1
+    print(f"INSERT INTO Professor (id_professor, cpf, id_depto) VALUES ({i}, '{cpf}', {id_depto});")
 
-# CURSOS
-output.append("\n-- CURSOS")
+### 4. Atualização dos Chefes de Depto
+print("\n-- CHEFES DE DEPTO (UPDATE)")
+for i in range(1, TOTAL_DEPTOS + 1):
+    chefe_id = i  # Define o professor com id = i como chefe do depto i
+    print(f"UPDATE Depto SET chefe_depto = {chefe_id} WHERE id_depto = {i};")
+
+### 5. Tabela Curso (usando nomes fixos)
+print("\n-- CURSO")
 for i in range(1, TOTAL_CURSOS + 1):
-    nome = f"Curso de {fake.job().split()[0]}"
-    id_depto = ((i - 1) % TOTAL_DEPARTAMENTOS) + 1
-    coordenador = ((i * 2 - 1) % TOTAL_PROFESSORES) + 1
-    output.append(f"INSERT INTO Curso (id_curso, nome, id_depto, coordenador_curso) VALUES ({i}, '{nome}', {id_depto}, {coordenador});")
+    nome_curso = CURSOS_FIXOS[i - 1]
+    id_depto = ((i - 1) % TOTAL_DEPTOS) + 1
+    # Coordenador: usa professor com id = i (ajuste se preferir)
+    coord_id = i
+    print(f"INSERT INTO Curso (id_curso, nome, id_depto, coordenador_curso) VALUES ({i}, '{nome_curso}', {id_depto}, {coord_id});")
 
-# DISCIPLINAS
-output.append("\n-- DISCIPLINAS")
+### 6. Tabela Disciplina (usando nomes fixos)
+print("\n-- DISCIPLINA")
 for i in range(1, TOTAL_DISCIPLINAS + 1):
-    nome = f"Disciplina {fake.word().capitalize()}"
-    id_depto = ((i - 1) % TOTAL_DEPARTAMENTOS) + 1
-    coordenador = ((i * 3 - 1) % TOTAL_PROFESSORES) + 1
-    output.append(f"INSERT INTO Disciplina (id_disciplina, nome, id_depto, coordenador_disciplina) VALUES ({i}, '{nome}', {id_depto}, {coordenador});")
+    nome_disciplina = DISCIPLINAS_FIXAS[i - 1]
+    id_depto = ((i - 1) % TOTAL_DEPTOS) + 1
+    # Coordenador da disciplina: professor com id = i (pode ser ajustado)
+    coord_id = i
+    print(f"INSERT INTO Disciplina (id_disciplina, nome, id_depto, coordenador_disciplina) VALUES ({i}, '{nome_disciplina}', {id_depto}, {coord_id});")
 
-# TURMAS
-output.append("\n-- TURMAS")
+### 7. Tabela Turma
+print("\n-- TURMA")
 for i in range(1, TOTAL_TURMAS + 1):
     periodo = random.randint(1, 8)
     ano = random.choice([2022, 2023, 2024])
     semestre = random.choice(['1', '2'])
-    id_disc = ((i - 1) % TOTAL_DISCIPLINAS) + 1
+    id_disciplina = ((i - 1) % TOTAL_DISCIPLINAS) + 1
     id_curso = ((i - 1) % TOTAL_CURSOS) + 1
-    output.append(f"INSERT INTO Turma (id_turma, periodo, ano, semestre_ano, id_disciplina, id_curso) VALUES ({i}, {periodo}, {ano}, '{semestre}', {id_disc}, {id_curso});")
+    print(f"INSERT INTO Turma (id_turma, periodo, ano, semestre_ano, id_disciplina, id_curso) VALUES ({i}, {periodo}, {ano}, '{semestre}', {id_disciplina}, {id_curso});")
 
-# ALUNOS
-output.append("\n-- ALUNOS")
-for i, cpf in enumerate(alu_cpfs, start=1):
+### 8. Tabela Aluno
+print("\n-- ALUNO")
+for i, cpf in enumerate(alunos_cpfs, start=1):
     id_curso = ((i - 1) % TOTAL_CURSOS) + 1
     id_turma = ((i - 1) % TOTAL_TURMAS) + 1
-    output.append(f"INSERT INTO Aluno (id_aluno, cpf, id_curso, id_turma) VALUES ({i}, '{cpf}', {id_curso}, {id_turma});")
+    print(f"INSERT INTO Aluno (id_aluno, cpf, id_curso, id_turma) VALUES ({i}, '{cpf}', {id_curso}, {id_turma});")
 
-# AULAS
-output.append("\n-- AULAS")
+### 9. Tabela Grupo_TCC e TCC
+print("\n-- GRUPO_TCC e TCC")
+for grupo_id in range(1, TOTAL_GRUPOS_TCC + 1):
+    alunos_grupo = [((grupo_id - 1) * ALUNOS_POR_GRUPO) + j + 1 for j in range(ALUNOS_POR_GRUPO)]
+    print(f"INSERT INTO Grupo_TCC (id_grupo, aluno1, aluno2, aluno3, aluno4, aluno5) VALUES ({grupo_id}, {alunos_grupo[0]}, {alunos_grupo[1]}, {alunos_grupo[2]}, {alunos_grupo[3]}, {alunos_grupo[4]});")
+    orientador = random.randint(1, TOTAL_PROFESSORES)
+    titulo = fake.sentence(nb_words=5)
+    print(f"INSERT INTO TCC (orientador, titulo, id_grupo) VALUES ({orientador}, '{titulo}', {grupo_id});")
+
+### 10. Tabela Aula
+print("\n-- AULA")
 for i in range(1, TOTAL_TURMAS + 1):
-    professor = ((i - 1) % TOTAL_PROFESSORES) + 1
-    output.append(f"INSERT INTO Aula (id_aula, id_turma, professor_aula) VALUES ({i}, {i}, {professor});")
+    prof = ((i - 1) % TOTAL_PROFESSORES) + 1
+    print(f"INSERT INTO Aula (id_aula, id_turma, professor_aula) VALUES ({i}, {i}, {prof});")
 
-# AVALIAÇÕES
-output.append("\n-- AVALIAÇÕES")
-for i in range(1, TOTAL_AVALIACOES + 1):
-    nota = random.randint(1, 10)
-    id_disc = ((i - 1) % TOTAL_DISCIPLINAS) + 1
-    output.append(f"INSERT INTO Avaliacao (id_avaliacao, nota, id_disciplina) VALUES ({i}, {nota}, {id_disc});")
-
-# NOTAS e HISTÓRICO
-output.append("\n-- NOTAS E HISTÓRICO")
+### 11. Tabelas Avaliacao, Nota e HistoricoEscolar
+print("\n-- AVALIACAO / NOTA / HISTORICO_ESCOLAR")
+avaliacao_id = 1
 nota_id = 1
-for id_aluno in range(1, TOTAL_ALUNOS + 1):
-    for _ in range(3):
-        id_turma = ((id_aluno + _) % TOTAL_TURMAS) + 1
-        id_aval = ((id_aluno + _) % TOTAL_AVALIACOES) + 1
-        output.append(f"INSERT INTO Nota (id_nota, id_aluno, id_turma, concluido, id_avaliacao) VALUES ({nota_id}, {id_aluno}, {id_turma}, TRUE, {id_aval});")
-        output.append(f"INSERT INTO HistoricoEscolar (id_aluno, id_turma, id_nota) VALUES ({id_aluno}, {id_turma}, {nota_id});")
+for disciplina_id in range(1, TOTAL_DISCIPLINAS + 1):
+    nota_valor = random.randint(5, 10)
+    print(f"INSERT INTO Avaliacao (id_avaliacao, nota, id_disciplina) VALUES ({avaliacao_id}, {nota_valor}, {disciplina_id});")
+    for aluno_id in range(1, TOTAL_ALUNOS + 1):
+        id_turma = ((aluno_id - 1) % TOTAL_TURMAS) + 1
+        print(f"INSERT INTO Nota (id_nota, id_aluno, id_turma, concluido, id_avaliacao) VALUES ({nota_id}, {aluno_id}, {id_turma}, TRUE, {avaliacao_id});")
+        print(f"INSERT INTO HistoricoEscolar (id_aluno, id_turma, id_nota) VALUES ({aluno_id}, {id_turma}, {nota_id});")
         nota_id += 1
-
-# GRUPOS DE TCC
-output.append("\n-- GRUPOS DE TCC")
-aluno_id = 1
-for grupo_id in range(1, TOTAL_GRUPOS + 1):
-    alunos_grupo = []
-    for _ in range(GRUPO_TAMANHO):
-        if aluno_id <= TOTAL_ALUNOS:
-            alunos_grupo.append(aluno_id)
-            aluno_id += 1
-        else:
-            alunos_grupo.append("NULL")
-    while len(alunos_grupo) < 5:
-        alunos_grupo.append("NULL")
-    output.append(f"INSERT INTO Grupo_TCC (id_grupo, aluno1, aluno2, aluno3, aluno4, aluno5) "
-                  f"VALUES ({grupo_id}, {alunos_grupo[0]}, {alunos_grupo[1]}, "
-                  f"{alunos_grupo[2]}, {alunos_grupo[3]}, {alunos_grupo[4]});")
-
-# TCCs
-output.append("\n-- TCCs")
-for grupo_id in range(1, TOTAL_GRUPOS + 1):
-    orientador_id = ((grupo_id - 1) % TOTAL_PROFESSORES) + 1
-    output.append(f"INSERT INTO TCC (orientador, titulo, id_grupo) "
-                  f"VALUES ({orientador_id}, 'TCC do Grupo {grupo_id}', {grupo_id});")
-
-# Exportar para arquivo SQL
-with open("dados_grandes_gerados.sql", "w", encoding="utf-8") as f:
-    f.write("\n".join(output))
-
-print("Arquivo dados_grandes_gerados.sql gerado com sucesso.")
+    avaliacao_id += 1
