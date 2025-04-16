@@ -136,14 +136,7 @@ flowchart LR
 ---
 
 ## 📊 Consultas SQL
-As queries obrigatórias e adicionais estão em `queries.sql`. Exemplos:
-
-| # | Descrição |
-|---|-----------|
-| 1 | Histórico escolar completo de aluno que reprovou e depois aprovou |
-| 2 | TCCs orientados por cada professor + nomes dos alunos |
-| … | *e assim por diante até a Query 50* |
-
+As queries obrigatórias e adicionais estão em `queries.sql´
 ---
 
 ## 📝 Licença
